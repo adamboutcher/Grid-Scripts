@@ -46,9 +46,14 @@ else
         shift
     done
     # Get a Proxy from host cert - chmod 400 these files and own it by your nagios user.
+    # Only renew if it's expired
     export X509_USER_CERT=/etc/nagios/hostcert.pem 
-    export X509_USER_KEY=/etc/nagios/hostkey.pem 
-    arcproxy >/dev/null 2>&1
+    export X509_USER_KEY=/etc/nagios/hostkey.pem
+    SECPROX=$(arcproxy -i validityEnd)
+    SECNOW=$(date +%s --date "30 seconds")
+    if [ $SECPROX -le $SECNOW ]; then
+        arcproxy >/dev/null 2>&1
+    fi
 
     DIFF=$(dpm-tester.py --host ${DHOST} --path ${DPATH} --tests ${DTEST} --cleanup | grep -i FAIL | wc -l)
 
@@ -56,11 +61,9 @@ else
     if [[ "$DIFF" > "0"  || "$?" > "0" ]]; then
         OUTPUT=$(dpm-tester.py --host ${DHOST} --path ${DPATH} --tests ${DTEST} --cleanup | tail -n1)
         echo "CRITICAL - DPM ${DTEST} - ${OUTPUT}";
-        arcproxy -r >/dev/null 2>&1
         exit 2;
     else
         echo "OK - DPM ${DTEST}";
-        arcproxy -r >/dev/null 2>&1
         exit 0;
     fi
 fi
