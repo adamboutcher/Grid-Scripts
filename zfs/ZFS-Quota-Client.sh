@@ -13,7 +13,7 @@ for i in "${servers[@]}"; do
 		zused=$(echo $zquota | awk -F'::' '{print $2}' | numfmt --to=iec);
 		ztotal=$(echo $zquota | awk -F'::' '{print $3}' | numfmt --to=iec);
 		zuperc=$(echo $zquota | awk -F'::' '{print $4}');
-		zage=$(stat -c %Y $i/quota.zfs | date +%c)
+		zage=$(date +"%c" -d @$(stat -c %Z $i/quota.zfs))
 		echo -e " $i\t\t\t$zused ($zuperc)\t$ztotal\t\t$zage"
 	fi
 done;
