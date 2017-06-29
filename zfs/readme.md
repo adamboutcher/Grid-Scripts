@@ -4,7 +4,7 @@ This is aimed at network envrionments where end users require some form of quota
 
 Put the server script into cron:
 ```bash
-echo "*/2 * * * * ZFS-Quota-Server.sh >/mnt/home/quota.zfs 2>&1" >> /etc/cron.d/zfs-quota
+echo "*/2 * * * * ZFS-Quota-Server.sh homes/home >/mnt/home/quota.zfs 2>&1" >> /etc/cron.d/zfs-quota
 ```
 
 the quota.zfs output should look similar to this:
