@@ -13,9 +13,9 @@ if [[ -z "$1" ]]; then
 fi
 
 if [[ -z "$2" ]]; then
-	zcmd=$(zfs userspace $1 -p | sed -n '1!p');
+	zcmd=$(/usr/sbin/zfs userspace $1 -p 2>/dev/null | sed -n '1!p');
 else 
-	zcmd=$(zfs userspace $1 -p | grep $2);
+	zcmd=$(/usr/sbin/zfs userspace $1 -p 2>/dev/null | grep $2);
 fi
 
 for zquota in `echo "$zcmd"`; do
