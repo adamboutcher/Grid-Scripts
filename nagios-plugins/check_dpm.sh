@@ -56,11 +56,13 @@ else
     fi
 
     DIFF=$(dpm-tester.py --host ${DHOST} --path ${DPATH} --tests ${DTEST} --cleanup | grep -i FAIL | wc -l)
+    rm -f /tmp/dpm-tests-tempfile
 
     # Test for the number of FAIL lines counted OR segfault Exit code (dpm-tester.py hasn't got exit codes implemented)
     if [[ "$DIFF" > "0"  || "$?" > "0" ]]; then
         OUTPUT=$(dpm-tester.py --host ${DHOST} --path ${DPATH} --tests ${DTEST} --cleanup | tail -n1)
         echo "CRITICAL - DPM ${DTEST} - ${OUTPUT}";
+	rm -f /tmp/dpm-tests-tempfile
         exit 2;
     else
         echo "OK - DPM ${DTEST}";
