@@ -3,11 +3,17 @@
 
 servers[0]="/mt/home"
 
-printf "\n Quota Report for $USER\n"
+if [ -z "$1" ]; then
+	QUSER=$USER
+else
+	QUSER=$1
+fi
+
+printf "\n Quota Report for $QUSER\n"
 printf ' %-30s %-15s %-15s %-25s\n' "Mount Point" "Used" "Total" "Last Checked";
 
 for i in "${servers[@]}"; do
-	zquota=$(cat $i/quota.zfs 2>/dev/null | grep $USER);
+	zquota=$(cat $i/quota.zfs 2>/dev/null | grep $QUSER);
 	if [[ ! -z "$zquota" ]]; then
 		zused=$(echo $zquota | awk -F'::' '{print $2}' | numfmt --to=iec);
 		ztotal=$(echo $zquota | awk -F'::' '{print $3}');
