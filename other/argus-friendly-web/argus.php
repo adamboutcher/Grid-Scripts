@@ -16,6 +16,8 @@ function ldap_array_find( $needle, $haystack , $instance = 1) {
   }
   return false;
 }
+
+$aa = gethostbyname("argus");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,7 +37,7 @@ function ldap_array_find( $needle, $haystack , $instance = 1) {
         <tr><th data-field="poolname">Pool User</th><th data-field="name">CN</th><th>VO</th><th>Site</th><th>Country</th><th>Certificate DN</th></tr>
       </thead><tbody>
     <?PHP
-      $argus_output = file_get_contents("/mt/admin/argus/userlist2.txt");
+      $argus_output = file_get_contents("/mt/admin/argus/userlist-$aa.txt");
       $argus_output = explode("\n",$argus_output);
       // Start at Number one as the first line is a header
       $i=1;
@@ -74,6 +76,7 @@ function ldap_array_find( $needle, $haystack , $instance = 1) {
       }
     ?>
     </table>
+    <p><small>Active Argus: <em><?php echo $aa; ?></em></small></p>
     </div></div></div>
 
     <script type="text/javascript" src="assets/js/jquery-1.11.2.min.js"></script>
