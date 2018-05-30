@@ -76,7 +76,10 @@ $aa = gethostbyname("argus");
       }
     ?>
     </table>
-    <p><small>Active Argus: <em><?php echo $aa; ?></em></small></p>
+    <p>
+       <small style="float:left;width:49%;">Active Argus: <em><?php echo $aa; ?></em></small>
+       <small style="float:right;text-align:right;width:49%;">Argus Cache: <em><?php echo date("j-m-Y H:i", filemtime("/mt/admin/argus/userlist-$aa.txt")); ?></em></small>
+    </p>
     </div></div></div>
 
     <script type="text/javascript" src="assets/js/jquery-1.11.2.min.js"></script>
