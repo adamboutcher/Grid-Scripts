@@ -1,10 +1,17 @@
 ## Sample Usage:
 
 This is aimed at network envrionments where end users require some form of quota output.
+We assume that the root of the ZFS mount point is the mount point for the users data, this may not be your use case, please change teh variable QLOC in the server script.
 
 Put the server script into cron:
 ```bash
-echo "*/2 * * * * root ZFS-Quota-Server.sh homes/home >/mnt/home/quota.zfs 2>&1" >> /etc/cron.d/zfs-quota
+echo "*/2 * * * * root ZFS-Quota-Server.sh homes/home >/dev/null 2>&1" >> /etc/cron.d/zfs-quota
+```
+
+Touch the quota.zfs and set permissions for first run, change homes/home for your ZFS vol.
+```bash
+touch $(zfs get mountpoint homes/home -H | awk '{print $3}')/quota.zfs
+chmod 744 $(zfs get mountpoint homes/home -H | awk '{print $3}')/quota.zfs
 ```
 
 the quota.zfs output should look similar to this:
