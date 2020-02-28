@@ -1,0 +1,43 @@
+version: '3.1'
+
+networks:
+  external:
+    external:
+      name: proxy
+
+services:
+  graphite:
+    image: graphiteapp/docker-graphite-statsd:latest
+    domainname: domain.fqdn
+    hostname: graphite
+    volumes:
+      - /mnt/docker/graphite/config:/opt/graphite/conf
+      - /mnt/docker/graphite/data:/opt/graphite/storage
+    restart: always
+    networks:
+      - external
+    environment:
+      COLLECTD: "1"
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.frontend.rule=Host:graphite.domain.fqdn"
+        - "traefik.port=80"
+        - "traefik.docker.network=proxy"
+
+  proxy:
+    image: haproxy:alpine
+    restart: always
+    ports:
+      - 2003:2003        # Carbon    [Graphite]
+      - 2004:2004        # Carbon    [Graphite]
+    volumes:
+      - /mnt/docker/.proxy/ha/graphite.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+     - external

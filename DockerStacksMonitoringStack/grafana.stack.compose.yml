@@ -1,0 +1,28 @@
+version: '3.1'
+
+networks:
+  external:
+    external:
+      name: proxy
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    domainname: domain.fdqn
+    hostname: grafana
+    volumes:
+      - /mnt/docker/grafana/data:/var/lib/grafana
+    restart: always
+    networks:
+      - external
+    environment:
+      GF_DEFAULT_INSTANCE_NAME: "grafana.domain.fqdn"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.frontend.rule=Host:grafana.domain.fdqn"
+        - "traefik.port=3000"
+        - "traefik.docker.network=proxy"

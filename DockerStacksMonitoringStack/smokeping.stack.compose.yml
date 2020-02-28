@@ -1,0 +1,27 @@
+version: '3.1'
+
+networks:
+  external:
+    external:
+      name: proxy
+
+services:
+  smokeping:
+    image: linuxserver/smokeping:latest
+    domainname: domain.fdqn
+    hostname: smokeping
+    volumes:
+      - /mnt/docker/smokeping/data:/data
+      - /mnt/docker/smokeping/config:/config
+    restart: always
+    networks:
+      - external
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.frontend.rule=Host:smokeping.domain.fdqn"
+        - "traefik.frontend.auth.basic.usersFile=/etc/traefik/.htpasswd"
+        - "traefik.port=80"
+        - "traefik.docker.network=proxy"
+

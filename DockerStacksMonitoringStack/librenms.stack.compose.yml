@@ -1,0 +1,139 @@
+version: '3.1'
+
+networks:
+  internal:
+    driver: overlay
+  external:
+    external:
+      name: proxy
+
+services:
+  db:
+    image: mariadb:latest
+    volumes:
+      - /mnt/docker/librenms/sql:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_USER: librenms
+      MYSQL_PASSWORD: '!librepass99'
+      MYSQL_DATABASE: librenms
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    networks:
+      - internal
+
+      - external
+
+    deploy:
+      replicas: 1
+
+  front:
+    image: librenms/librenms:latest
+    domainname: domain.fdqn
+    hostname: librenms
+    volumes:
+      - /mnt/docker/librenms/data:/data
+      - /mnt/docker/smokeping/data:/data/rrd/smokeping:ro
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_USER: librenms
+      PUID: 1000
+      PGID: 1000
+      DB_PASSWORD: '!librepass99'
+      REAL_IP_FROM: 0.0.0.0/32
+      REAL_IP_HEADER: X-Forwarded-For
+      LOG_IP_VAR: http_x_forwarded_for
+    networks:
+      - internal
+      - external
+    depends_on:
+      - db
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.frontend.rule=Host:librenms.domain.fdqn"
+        - "traefik.port=8000"
+        - "traefik.docker.network=proxy"
+
+
+  memcached:
+    image: memcached:alpine
+    restart: always
+    networks:
+      - internal
+      - external
+    depends_on:
+      - front
+      - db
+    deploy:
+      replicas: 1
+
+  rrdcached:
+    image: crazymax/rrdcached
+    volumes:
+      - "/mnt/docker/librenms/data/rrd:/data/db"
+      - "/mnt/docker/librenms/data/rrd-journal:/data/journal"
+      - "/mnt/docker/smokeping/data:/data/db/smokeping:ro"
+    environment:
+      - "LOG_LEVEL=LOG_INFO"
+      - "WRITE_TIMEOUT=1800"
+      - "WRITE_JITTER=1800"
+      - "WRITE_THREADS=4"
+      - "FLUSH_DEAD_DATA_INTERVAL=3600"
+    restart: always
+    networks:
+      - internal
+      - external
+    depends_on:
+      - front
+    deploy:
+      replicas: 1
+
+
+  cron:
+    image: librenms/librenms:latest
+#    command:
+#      - "/usr/local/bin/cron"
+    volumes:
+      - /mnt/docker/librenms/data:/data
+      - /mnt/docker/smokeping/data:/data/rrd/smokeping:ro
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_USER: librenms
+      DB_PASSWORD: '!librepass99'
+      SIDECAR_CRON: 1
+      PUID: 1000
+      PGID: 1000
+      LIBRENMS_POLLER_THREADS: 16
+      LIBRENMS_POLLER_INTERVAL: 5
+      LIBRENMS_CRON_POLLER_ENABLE: 'true'
+      LIBRENMS_CRON_DISCOVERY_ENABLE: 'true'
+      LIBRENMS_CRON_DAILY_ENABLE: 'true'
+      LIBRENMS_CRON_ALERTS_ENABLE: 'true'
+      LIBRENMS_CRON_BILLING_ENABLE: 'true'
+      LIBRENMS_CRON_BILLING_CALCULATE_ENABLE: 'true'
+    depends_on:
+      - db
+      - front
+    networks:
+      - internal
+
+  proxy:
+    image: haproxy:alpine
+    restart: always
+    ports:
+      - 3306:3306        # MySQL     [LibreNMS]
+      - 11211:11211      # MemCacheD [LibreNMS]
+      - 42217:42217      # RRDCacheD [LibreNMS]
+    volumes:
+      - /mnt/docker/.proxy/ha/librenms.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+     - external
+

@@ -1,0 +1,62 @@
+version: '3.1'
+
+networks:
+  internal:
+    driver: overlay
+  external:
+    external:
+      name: proxy
+
+services:
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:7.5.0
+    restart: always
+    environment:
+      SERVER_NAME: kibana.domain.fdqn
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      SERVER_MAXPAYLOADBYTES: 4194304
+    depends_on:
+      - elasticsearch
+    networks:
+      - internal
+      - external
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.frontend.rule=Host:kibana.domain.fdqn"
+        - "traefik.frontend.auth.basic.usersFile=/etc/traefik/.htpasswd"
+        - "traefik.port=5601"
+        - "traefik.docker.network=proxy"
+
+  elasticsearch:
+    image: elasticsearch:7.5.0
+    volumes:
+      - /mnt/elk/elastic/data:/usr/share/elasticsearch/data
+      - /mnt/elk/elastic/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - search.max_buckets=100000
+      - indices.query.bool.max_clause_count=8192
+    networks:
+      - internal
+      - external
+    deploy:
+      replicas: 1
+
+  proxy:
+    image: haproxy:alpine
+    restart: always
+    ports:
+      - 9200:9200        # Elastic   [ELK]
+    volumes:
+      - /mnt/docker/.proxy/ha/elk.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+     - external

@@ -1,0 +1,43 @@
+version: "3.1"
+
+networks:
+  proxy:
+    external:
+      name: proxy
+
+services:
+  traefik:
+    image: traefik:alpine
+    command:
+      - "--web"
+      - "--entryPoints=Name:http Address::80 Redirect.EntryPoint:https"
+#      - "--entrypoints=Name:http Address::80"
+      - "--entrypoints=Name:https Address::443 TLS"
+      - "--defaultEntryPoints=http,https"
+      - "--docker"
+      - "--docker.watch"
+      - "--docker.swarmMode"
+      - "--docker.domain=domain.fqdn"
+      - "--acme"
+      - "--acme.storage=/etc/traefik/acme/acme.json"
+      - "--acme.entryPoint=https"
+      - "--acme.httpChallenge.entryPoint=http"
+      - "--acme.onHostRule=true"
+      - "--acme.onDemand=true"
+      - "--acme.email=oper.ip3@domain.fqdn"
+      - "--api" #webUI Control
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080 #WebUI Access
+    volumes:
+      - /mnt/docker/.proxy/traefik:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      - proxy

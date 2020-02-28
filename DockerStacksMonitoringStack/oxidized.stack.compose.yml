@@ -1,0 +1,20 @@
+version: '3.1'
+
+networks:
+  external:
+    external:
+      name: proxy
+
+services:
+  oxidized:
+    image: oxidized/oxidized:latest
+    hostname: oxidized
+    environment:
+      CONFIG_RELOAD_INTERVAL: "7200"
+    volumes:
+      - /mnt/docker/oxidized:/root/.config/oxidized
+    restart: always
+    networks:
+      - external
+    deploy:
+      replicas: 1

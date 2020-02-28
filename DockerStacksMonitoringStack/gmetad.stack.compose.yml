@@ -1,0 +1,26 @@
+version: '3.1'
+
+networks:
+  external:
+    external:
+      name: proxy
+
+services:
+  gmetad:
+    image: wookietreiber/ganglia:latest
+    command: --without-gmond
+    hostname: ganglia.domain.fdqn
+    volumes:
+      - /mnt/docker/ganglia/data:/var/lib/ganglia
+      - /mnt/docker/ganglia/config:/etc/ganglia
+    restart: always
+    networks:
+      - external
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.frontend.rule=Host:ganglia.domain.fdqn"
+        - "traefik.port=80"
+        - "traefik.docker.network=proxy"
+
