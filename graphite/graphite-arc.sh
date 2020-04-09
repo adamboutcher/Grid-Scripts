@@ -57,8 +57,10 @@ TOTAL=$(ls $CONTROLDIR/*/*.status | wc -l)
 # Grabbing FS Info
 CONTROLDIR_USED=$(df $CONTROLDIR | tail -n1 | awk '{print $3}')
 CONTROLDIR_AVAIL=$(df $CONTROLDIR | tail -n1 | awk '{print $4}')
+CONTROLDIR_PERC=$(df $CONTROLDIR | tail -n1 | awk '{print $5}' | sed 's/\%//g') 
 WORKDIR_USED=$(df $WORKDIR | tail -n1 | awk '{print $3}')
 WORKDIR_AVAIL=$(df $WORKDIR | tail -n1 | awk '{print $4}')
+WORKDIR_PERC=$(df $WORKDIR | tail -n1 | awk '{print $5}' | sed 's/\%//g')
 
 stamp=$(date +%s);
 # Send to Graphite
@@ -79,8 +81,10 @@ if [[ $? -eq 0 ]]; then
   if [[ ! -z "$TOTAL" ]]; then echo "${PREFIX}arc.$(hostname -s).stats.total $TOTAL $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
   if [[ ! -z "$CONTROLDIR_USED" ]]; then echo "${PREFIX}arc.$(hostname -s).stats.controldir_used $CONTROLDIR_USED $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
   if [[ ! -z "$CONTROLDIR_AVAIL" ]]; then echo "${PREFIX}arc.$(hostname -s).stats.controldir_avail $CONTROLDIR_AVAIL $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
+  if [[ ! -z "$CONTROLDIR_PERC" ]]; then echo "${PREFIX}arc.$(hostname -s).stats.controldir_percused $CONTROLDIR_PERC $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
   if [[ ! -z "$WORKDIR_USED" ]]; then echo "${PREFIX}arc.$(hostname -s).stats.workdir_used $WORKDIR_USED $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
   if [[ ! -z "$WORKDIR_AVAIL" ]]; then echo "${PREFIX}arc.$(hostname -s).stats.workdir_avail $WORKDIR_AVAIL $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
+  if [[ ! -z "$WORKDIR_PERC" ]]; then echo "${PREFIX}arc.$(hostname -s).stats.workdir_percused $WORKDIR_PERC $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
 fi
 
 exit 0
