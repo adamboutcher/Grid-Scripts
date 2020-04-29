@@ -82,7 +82,7 @@ else
         shift
         ;;
       --servicestate)
-        OPT_ss="$2"
+        OPT_SS="$2"
         shift
         ;;
       --hostoutput|--serviceoutput)
