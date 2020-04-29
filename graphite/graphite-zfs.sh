@@ -1,5 +1,11 @@
 #!/bin/bash
 #/usr/local/sbin/graphite-zfs.sh
+#
+# ZFS on Linux Graphite Metrics
+# This is by no means fully featured and is very poorly tested.
+# 2020 - Adam Boutcher - Durham University (UKI-SCOTGRID-DURHAM).
+#
+
 GRAPHITE="172.16.0.1"
 GPORT="2003"
 PREFIX="prefix."
@@ -56,7 +62,6 @@ stamp=$(date +"%s")
 
 for POOL in $POOLS; do
   DATA=$(cat /proc/spl/kstat/zfs/$POOL/io)
-  ZP=$($ZPOOL list -Hp $POOL)
 
   nread=$(echo "$DATA"    | tail -n1 | awk '{print $1}')
   nwritten=$(echo "$DATA" | tail -n1 | awk '{print $2}')
