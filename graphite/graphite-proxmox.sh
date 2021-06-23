@@ -50,11 +50,11 @@ for node in $(echo "$PVENODES"); do
 
   nc -z $GRAPHITE $GPORT 1>/dev/null 2>&1
   if [[ $? -eq 0 ]]; then
-    if [[ ! -z "$cpu" ]]; then echo "$PREFIX.proxmox.$PVECLUTER.$(hostname -s).$name.cpu $cpu $stamp" | /usr/bin/nc -w 3 $GRAPHITE $GPORT & fi
-    if [[ ! -z "$maxcpu" ]]; then echo "$PREFIX.proxmox.$PVECLUTER.$(hostname -s).$name.maxcpu $maxcpu $stamp" | /usr/bin/nc -w 3 $GRAPHITE $GPORT & fi
-    if [[ ! -z "$maxmem" ]]; then echo "$PREFIX.proxmox.$PVECLUTER.$(hostname -s).$name.maxmem $maxmem $stamp" | /usr/bin/nc -w 3 $GRAPHITE $GPORT & fi
-    if [[ ! -z "$mem" ]]; then echo "$PREFIX.proxmox.$PVECLUTER.$(hostname -s).$name.mem $mem $stamp" | /usr/bin/nc -w 3 $GRAPHITE $GPORT & fi
-    if [[ ! -z "$uptime" ]]; then echo "$PREFIX.proxmox.$PVECLUTER.$(hostname -s).$name.uptime $uptime $stamp" | /usr/bin/nc -w 3 $GRAPHITE $GPORT & fi
+    if [[ ! -z "$cpu" ]]; then echo "${PREFIX}proxmox.$PVECLUTER.$(hostname -s).$name.cpu $cpu $stamp" | /usr/bin/nc -w 3 $GRAPHITE $GPORT & fi
+    if [[ ! -z "$maxcpu" ]]; then echo "${PREFIX}proxmox.$PVECLUTER.$(hostname -s).$name.maxcpu $maxcpu $stamp" | /usr/bin/nc -w 3 $GRAPHITE $GPORT & fi
+    if [[ ! -z "$maxmem" ]]; then echo "${PREFIX}proxmox.$PVECLUTER.$(hostname -s).$name.maxmem $maxmem $stamp" | /usr/bin/nc -w 3 $GRAPHITE $GPORT & fi
+    if [[ ! -z "$mem" ]]; then echo "${PREFIX}proxmox.$PVECLUTER.$(hostname -s).$name.mem $mem $stamp" | /usr/bin/nc -w 3 $GRAPHITE $GPORT & fi
+    if [[ ! -z "$uptime" ]]; then echo "${PREFIX}proxmox.$PVECLUTER.$(hostname -s).$name.uptime $uptime $stamp" | /usr/bin/nc -w 3 $GRAPHITE $GPORT & fi
   fi
 
 done

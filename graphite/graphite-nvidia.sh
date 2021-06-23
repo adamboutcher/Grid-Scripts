@@ -58,12 +58,12 @@ while [ $i -lt $count ]; do
 
   nc -z $GRAPHITE $GPORT >/dev/null 2>&1
   if [ $? -eq 0 ]; then
-    if [[ ! -z "$gpu_power" ]]; then    echo "$PREFIXgpu.$HOST.$i.$gpu_name.POWER $gpu_power $stamp"      | nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
-    if [[ ! -z "$gpu_pid" ]]; then      echo "$PREFIXgpu.$HOST.$i.$gpu_name.PID_COUNT $gpu_pid $stamp"    | nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
-    if [[ ! -z "$gpu_gpuutil" ]]; then  echo "$PREFIXgpu.$HOST.$i.$gpu_name.GPU_UTIL $gpu_gpuutil $stamp" | nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
-    if [[ ! -z "$gpu_memutil" ]]; then  echo "$PREFIXgpu.$HOST.$i.$gpu_name.MEM_UTIL $gpu_memutil $stamp" | nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
-    if [[ ! -z "$gpu_gputemp" ]]; then  echo "$PREFIXgpu.$HOST.$i.$gpu_name.GPU_TEMP $gpu_gputemp $stamp"	| nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
-    if [[ ! -z "$gpu_memtemp" ]]; then  echo "$PREFIXgpu.$HOST.$i.$gpu_name.MEM_TEMP $gpu_memtemp $stamp"	| nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
+    if [[ ! -z "$gpu_power" ]]; then    echo "${PREFIX}gpu.$HOST.$i.$gpu_name.POWER $gpu_power $stamp"      | nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
+    if [[ ! -z "$gpu_pid" ]]; then      echo "${PREFIX}gpu.$HOST.$i.$gpu_name.PID_COUNT $gpu_pid $stamp"    | nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
+    if [[ ! -z "$gpu_gpuutil" ]]; then  echo "${PREFIX}gpu.$HOST.$i.$gpu_name.GPU_UTIL $gpu_gpuutil $stamp" | nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
+    if [[ ! -z "$gpu_memutil" ]]; then  echo "${PREFIX}gpu.$HOST.$i.$gpu_name.MEM_UTIL $gpu_memutil $stamp" | nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
+    if [[ ! -z "$gpu_gputemp" ]]; then  echo "${PREFIX}gpu.$HOST.$i.$gpu_name.GPU_TEMP $gpu_gputemp $stamp" | nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
+    if [[ ! -z "$gpu_memtemp" ]]; then  echo "${PREFIX}gpu.$HOST.$i.$gpu_name.MEM_TEMP $gpu_memtemp $stamp" | nc -w 3 $GRAPHITE $GPORT 2>/dev/null; fi
   fi
 
   i=$(($i+1))
