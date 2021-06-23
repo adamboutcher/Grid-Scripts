@@ -83,22 +83,25 @@ for POOL in $POOLS; do
   zpfrag=$($ZPOOL get -Hp frag $POOL | awk '{print $3}')
   zpcap=$($ZPOOL get -Hp cap $POOL | awk '{print $3}')
 
-  if [[ ! -z "$nread" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.stats.nread $nread $stamp"       | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$nwritten" ]]; then echo "$PREFIX.zfs.$HOST.$POOL.stats.nwritten $nwritten $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$reads" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.stats.reads $reads $stamp"       | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$writes" ]]; then   echo "$PREFIX.zfs.$HOST.$POOL.stats.writes $writes $stamp"     | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$wtime" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.stats.wtime $wtime $stamp"       | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$wlentime" ]]; then echo "$PREFIX.zfs.$HOST.$POOL.stats.wlentime $wlentime $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$wupdate" ]]; then  echo "$PREFIX.zfs.$HOST.$POOL.stats.wupdate $wupdate $stamp"   | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$rtime" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.stats.rtime $rtime $stamp"       | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$rlentime" ]]; then echo "$PREFIX.zfs.$HOST.$POOL.stats.rlentime $rlentime $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$wcnt" ]]; then     echo "$PREFIX.zfs.$HOST.$POOL.stats.wcnt $wcnt $stamp"         | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$rcnt" ]]; then     echo "$PREFIX.zfs.$HOST.$POOL.stats.rcnt $rcnt $stamp"         | nc -w 3 $GRAPHITE $GPORT; fi
+  nc -z $GRAPHITE $GPORT 1>/dev/null 2>&1
+  if [[ $? -eq 0 ]]; then
+    if [[ ! -z "$nread" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.stats.nread $nread $stamp"       | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$nwritten" ]]; then echo "$PREFIX.zfs.$HOST.$POOL.stats.nwritten $nwritten $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$reads" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.stats.reads $reads $stamp"       | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$writes" ]]; then   echo "$PREFIX.zfs.$HOST.$POOL.stats.writes $writes $stamp"     | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$wtime" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.stats.wtime $wtime $stamp"       | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$wlentime" ]]; then echo "$PREFIX.zfs.$HOST.$POOL.stats.wlentime $wlentime $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$wupdate" ]]; then  echo "$PREFIX.zfs.$HOST.$POOL.stats.wupdate $wupdate $stamp"   | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$rtime" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.stats.rtime $rtime $stamp"       | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$rlentime" ]]; then echo "$PREFIX.zfs.$HOST.$POOL.stats.rlentime $rlentime $stamp" | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$wcnt" ]]; then     echo "$PREFIX.zfs.$HOST.$POOL.stats.wcnt $wcnt $stamp"         | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$rcnt" ]]; then     echo "$PREFIX.zfs.$HOST.$POOL.stats.rcnt $rcnt $stamp"         | nc -w 3 $GRAPHITE $GPORT; fi
 
-  if [[ ! -z "$total" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.pool.total $total $stamp"        | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$used" ]]; then     echo "$PREFIX.zfs.$HOST.$POOL.pool.used $used $stamp"          | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$free" ]]; then     echo "$PREFIX.zfs.$HOST.$POOL.pool.free $free $stamp"          | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$zpst" ]]; then     echo "$PREFIX.zfs.$HOST.$POOL.pool.state $zpst $stamp"         | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$zpfrag" ]]; then   echo "$PREFIX.zfs.$HOST.$POOL.pool.fragperc $zpfrag $stamp"    | nc -w 3 $GRAPHITE $GPORT; fi
-  if [[ ! -z "$zpcap" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.pool.usedperc $zpcap $stamp"     | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$total" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.pool.total $total $stamp"        | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$used" ]]; then     echo "$PREFIX.zfs.$HOST.$POOL.pool.used $used $stamp"          | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$free" ]]; then     echo "$PREFIX.zfs.$HOST.$POOL.pool.free $free $stamp"          | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$zpst" ]]; then     echo "$PREFIX.zfs.$HOST.$POOL.pool.state $zpst $stamp"         | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$zpfrag" ]]; then   echo "$PREFIX.zfs.$HOST.$POOL.pool.fragperc $zpfrag $stamp"    | nc -w 3 $GRAPHITE $GPORT; fi
+    if [[ ! -z "$zpcap" ]]; then    echo "$PREFIX.zfs.$HOST.$POOL.pool.usedperc $zpcap $stamp"     | nc -w 3 $GRAPHITE $GPORT; fi
+  fi
 done;
