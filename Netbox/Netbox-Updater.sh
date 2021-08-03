@@ -67,57 +67,59 @@ else
     esac
     shift
   done
+fi
 
-  if [[ $DIR -z ]]; then
-    DIR="/opt"
-  fi
-  if [[ $PRE -z ]]; then
-    >&2 echo "Missing Arguments Supplied."
-    >&2 echo "Check --usage for usaged details."
-    exit 1
-  fi
-  if [[ $LAT -z ]]; then
-    >&2 echo "Missing Arguments Supplied."
-    >&2 echo "Check --usage for usaged details."
-    exit 1
-  fi
+if [[ $DIR -z ]]; then
+  DIR="/opt"
+fi
+if [[ $PRE -z ]]; then
+  >&2 echo "Missing Arguments Supplied."
+  >&2 echo "Check --usage for usaged details."
+  exit 1
+fi
+if [[ $LAT -z ]]; then
+  >&2 echo "Missing Arguments Supplied."
+  >&2 echo "Check --usage for usaged details."
+  exit 1
+fi
 
-  # Check for Previous directory
-  if [[ $(test -d ${DIR}/netbox-${PRE}) -eq 1 ]]; then
-    >&2 echo "Previous version not found."
-    exit 2
-  fi
+# Check for Previous directory
+if [[ $(test -d ${DIR}/netbox-${PRE}) -eq 1 ]]; then
+  >&2 echo "Previous version not found."
+  exit 2
+fi
 
-  echo "1. Downloading latest archive"
-  wget -q https://github.com/netbox-community/netbox/archive/v${LAT}.tar.gz -O ${DIR}/latest.tar.gz
-  if [[ $? != 0 ]]; then
-    >&2 echo "Cannot find the latest version on GitHub."
-    exit 3
-  fi
-  tar -xzf ${DIR}/latest.tar.gz -C /opt
+echo "1. Downloading latest archive"
+wget -q https://github.com/netbox-community/netbox/archive/v${LAT}.tar.gz -O ${DIR}/latest.tar.gz
+if [[ $? != 0 ]]; then
+  >&2 echo "Cannot find the latest version on GitHub."
+  exit 3
+fi
+tar -xzf ${DIR}/latest.tar.gz -C /opt
 
-  echo "2. Copying Configs and reports etc"
-  # Check for Latest directory
-  if [[ $(test -d ${DIR}/netbox-${LAT}) -eq 1 ]]; then
-    >&2 echo "Latest version not found."
-    exit 2
-  fi
-  cp -pr ${DIR}/netbox-${PRE}/local_requirements.txt ${DIR}/netbox-${LAT}/
-  cp -pr ${DIR}/netbox-${PRE}/gunicorn.py ${DIR}/netbox-${LAT}/
-  cp -pr ${DIR}/netbox-${PRE}/netbox/netbox/configuration.py ${DIR}/netbox-${LAT}/netbox/netbox/
-  cp -pr ${DIR}/netbox-${PRE}/netbox/netbox/ldap_config.py ${DIR}/netbox-${LAT}/netbox/netbox/
-  cp -pr ${DIR}/netbox-${PRE}/netbox/{media,scripts,reports} ${DIR}/netbox-${LAT}/netbox/
+echo "2. Copying Configs and reports etc"
+# Check for Latest directory
+if [[ $(test -d ${DIR}/netbox-${LAT}) -eq 1 ]]; then
+  >&2 echo "Latest version not found."
+  exit 2
+fi
+cp -pr ${DIR}/netbox-${PRE}/local_requirements.txt ${DIR}/netbox-${LAT}/
+cp -pr ${DIR}/netbox-${PRE}/gunicorn.py ${DIR}/netbox-${LAT}/
+cp -pr ${DIR}/netbox-${PRE}/netbox/netbox/configuration.py ${DIR}/netbox-${LAT}/netbox/netbox/
+cp -pr ${DIR}/netbox-${PRE}/netbox/netbox/ldap_config.py ${DIR}/netbox-${LAT}/netbox/netbox/
+cp -pr ${DIR}/netbox-${PRE}/netbox/{media,scripts,reports} ${DIR}/netbox-${LAT}/netbox/
 
-  echo "3. Running Upgrade Script"
-  cd ${DIR}/netbox-${LAT}
-  ./upgrade.sh
-  cd -
+echo "3. Running Upgrade Script"
+cd ${DIR}/netbox-${LAT}
+./upgrade.sh
+cd -
 
-  echo "4. Symlinking the version to live"
-  rm ${DIR}/netbox
-  ln -sfn ${DIR}/netbox-${LAT}/ ${DIR}/netbox
+echo "4. Symlinking the version to live"
+rm ${DIR}/netbox
+ln -sfn ${DIR}/netbox-${LAT}/ ${DIR}/netbox
 
-  echo "5. restarting services"
-  systemctl restart netbox netbox-rq
+echo "5. restarting services"
+systemctl restart netbox netbox-rq
 
-  echo "Done!"
+echo "Done!"
+exit 0
