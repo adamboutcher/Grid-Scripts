@@ -98,10 +98,6 @@ class netbox::deps:common {
     }
   }
 
-}
-
-class netbox::deps::download {
-
   if ! defined (Package['wget']) {
     package { 'wget':
       ensure => installed
@@ -113,6 +109,10 @@ class netbox::deps::download {
     }
   }
 
+}
+
+class netbox::deps::download {
+
   exec { "download_netbox_$netbox_version":
     command  => "wget -q https://github.com/netbox-community/netbox/archive/refs/tags/v$netbox_version.tar.gz -O /opt/netbox.tar.gz",
     user     => 'root',
@@ -120,7 +120,6 @@ class netbox::deps::download {
     path     => ['/bin','/usr/bin','/usr/sbin'],
     provider => 'shell',
     notify   => Exec["untar_netbox_$netbox_version"],
-    require  => Package['wget'],
   }
   exec { "untar_netbox_$netbox_version":
     command     => "tar -xzf /opt/netbox.tar.gz -C /opt",
@@ -130,7 +129,6 @@ class netbox::deps::download {
     provider    => 'shell',
     refreshonly => true,
     notify      => File['/opt/netbox'],
-    require     => Package['tar'],
   }
   file { '/opt/netbox'
     ensure      => link,
