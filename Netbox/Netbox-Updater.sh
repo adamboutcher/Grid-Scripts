@@ -112,6 +112,11 @@ cp -pr ${DIR}/netbox-${PRE}/netbox/{media,scripts,reports} ${DIR}/netbox-${LAT}/
 echo "3. Running Upgrade Script"
 cd ${DIR}/netbox-${LAT}
 ./upgrade.sh
+EXT=$?
+if [[ $EXT != 0 ]]; then
+  >&2 echo "Netbox upgrade failed, check the output or run manually."
+  exit $EXT
+fi
 cd -
 
 echo "4. Symlinking the version to live"
