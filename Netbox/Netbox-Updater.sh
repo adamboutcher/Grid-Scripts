@@ -44,7 +44,7 @@ if [ $# != 0 ] && ([ $1 = "-h" ] || [ $1 = "--help" ] || [ $1 = "-u" ] || [ $1 =
   echo ""
   exit 0
 else
-	while [[ $# -gt 1 ]]; do
+  while [[ $# -gt 1 ]]; do
     key="$1"
     case $key in
       -p|--previous)
