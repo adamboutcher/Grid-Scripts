@@ -5,35 +5,41 @@
 #
 
 class netbox::two {
-  $netbox_version = hiera('netbox_version', '2.11.10')
+  $netbox_version = '2.11.10'
   include netbox::deps::common
   include netbox::deps::two
-  include netbox::deps::download
   class { 'netbox::deps::download':
-    netbox_version = $netbox_version
+    netbox_version => $netbox_version,
+  }
+  class { 'netbox::deps::config':
+    netbox_version => $netbox_version,
   }
   Class['netbox::deps::common'] -> Class['netbox::deps::two']
   Class['netbox::deps::two'] -> Class['netbox::deps::download']
+  Class['netbox::deps::download'] -> Class['netbox::deps::config']
 }
 
 class netbox::three {
-  $netbox_version = hiera('netbox_version', '3.0-beta1')
+  $netbox_version = '3.0-beta1'
   include netbox::deps::common
   include netbox::deps::three
-  include netbox::deps::download
   class { 'netbox::deps::download':
-    netbox_version = $netbox_version
+    netbox_version => $netbox_version,
+  }
+  class { 'netbox::deps::config':
+    netbox_version => $netbox_version,
   }
   Class['netbox::deps::common'] -> Class['netbox::deps::three']
   Class['netbox::deps::three'] -> Class['netbox::deps::download']
+  Class['netbox::deps::download'] -> Class['netbox::deps::config']
 }
 
-class netbox::deps:common {
+class netbox::deps::common {
   if ( $::osfamily != 'RedHat' ) {
     fail('This module is only tested on RedHat based machines')
   }
   if ! defined (File['/opt']) {
-    file { '/opt'
+    file { '/opt':
       ensure => present,
     }
   }
@@ -107,13 +113,11 @@ class netbox::deps:common {
       ensure => installed
     }
   }
-
 }
 
 class netbox::deps::download (
   String $netbox_version = '2.11.0'
 ) {
-
   exec { "download_netbox_$netbox_version":
     command  => "wget -q https://github.com/netbox-community/netbox/archive/refs/tags/v$netbox_version.tar.gz -O /opt/netbox.tar.gz",
     user     => 'root',
@@ -131,13 +135,58 @@ class netbox::deps::download (
     refreshonly => true,
     notify      => File['/opt/netbox'],
   }
-  file { '/opt/netbox'
+
+}
+
+class netbox::deps::config (
+  String $netbox_version = '2.11.0'
+) {
+  file { '/opt/netbox':
     ensure      => link,
     target      => "/opt/netbox-$netbox_version",
     refreshonly => true,
     require     => Exec["untar_netbox_$netbox_version"],
   }
-
+  file { "/opt/netbox-$netbox_version/gunicorn.py":
+    ensure  => file,
+    mode    => '0755',
+    owner   => 'root',
+    group   => 'root',
+    content => file('netbox/gunicorn.py'),
+  }
+  file { '/etc/systemd/system/netbox-rq.service':
+    ensure  => file,
+    mode    => '0755',
+    owner   => 'root',
+    group   => 'root',
+    content => file('netbox/netbox-rq.service'),
+    notify  => File['netbox_systemctl_daemon_reload'],
+  }
+  file { '/etc/systemd/system/netbox.service':
+    ensure  => file,
+    mode    => '0755',
+    owner   => 'root',
+    group   => 'root',
+    content => file('netbox/netbox.service'),
+    notify  => File['netbox_systemctl_daemon_reload'],
+  }
+  exec { 'netbox_systemctl_daemon_reload':
+    command     => "systemctl daemon-reload",
+    user        => 'root',
+    path        => ['/bin','/usr/bin','/usr/sbin'],
+    provider    => 'shell',
+    refreshonly => true,
+  }
+  service { 'netbox-rq':
+    ensure  => 'running',
+    enable  => true,
+    require => File['/etc/systemd/system/netbox-rq.service'],
+  }
+  service { 'netbox':
+    ensure  => 'running',
+    enable  => true,
+    require => File['/etc/systemd/system/netbox.service'],
+  }
 }
 
 class netbox::deps::two {
