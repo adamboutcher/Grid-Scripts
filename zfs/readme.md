@@ -1,6 +1,6 @@
 # Moved...
 
-This work has been split into it's own repo found at [aboutcher/zfs-quota](https://github.com/aboutcher/zfs-quota). This code was pushed into v1 branch and will be maintained there.
+This work has been split into it's own repo found at [adamboutcher/zfs-quota](https://github.com/adamboutcher/zfs-quota). This code was pushed into v1 branch and will be maintained there.
 
 ## Sample Usage:
 
