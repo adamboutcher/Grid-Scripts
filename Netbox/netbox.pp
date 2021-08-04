@@ -1,6 +1,7 @@
 #
 # Netbox installer for Puppet
 # This hasn't been used or ran through a parser, YMMV.
+# We target CentOS.
 # 2021 - Adam Boutcher - IPPP, Durham University (UKI-SCOTGRID-DURHAM).
 #
 
@@ -300,5 +301,29 @@ class netbox::deps::three {
     }
   } else {
     fail('Not supported yet supported on non-CentOS')
+  }
+}
+
+class netbox::web::apache {
+  file { '/etc/httpd/conf.d/netbox.conf':
+    ensure  => file,
+    mode    => '0644',
+    owner   => 'root',
+    group   => 'root',
+    content => file('netbox/apache.conf'),
+    require => [ Service['netbox'], Package['httpd'], ],
+    notify  => Service['httpd'],
+  }
+}
+
+class netbox::web::nginx {
+  file { '/etc/nginx/conf.d/netbox.conf':
+    ensure  => file,
+    mode    => '0644',
+    owner   => 'root',
+    group   => 'root',
+    content => file('netbox/nginx.conf'),
+    require => [ Service['netbox'], Package['nginx'], ],
+    notify  => Service['nginx'],
   }
 }
