@@ -9,6 +9,9 @@ class netbox::two {
   include netbox::deps::common
   include netbox::deps::two
   include netbox::deps::download
+  class { 'netbox::deps::download':
+    netbox_version = $netbox_version
+  }
   Class['netbox::deps::common'] -> Class['netbox::deps::two']
   Class['netbox::deps::two'] -> Class['netbox::deps::download']
 }
@@ -18,6 +21,9 @@ class netbox::three {
   include netbox::deps::common
   include netbox::deps::three
   include netbox::deps::download
+  class { 'netbox::deps::download':
+    netbox_version = $netbox_version
+  }
   Class['netbox::deps::common'] -> Class['netbox::deps::three']
   Class['netbox::deps::three'] -> Class['netbox::deps::download']
 }
@@ -104,7 +110,9 @@ class netbox::deps:common {
 
 }
 
-class netbox::deps::download {
+class netbox::deps::download (
+  String $netbox_version = '2.11.0'
+) {
 
   exec { "download_netbox_$netbox_version":
     command  => "wget -q https://github.com/netbox-community/netbox/archive/refs/tags/v$netbox_version.tar.gz -O /opt/netbox.tar.gz",
