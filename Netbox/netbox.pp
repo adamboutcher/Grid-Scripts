@@ -145,7 +145,6 @@ class netbox::deps::config (
   file { '/opt/netbox':
     ensure      => link,
     target      => "/opt/netbox-$netbox_version",
-    refreshonly => true,
     require     => Exec["untar_netbox_$netbox_version"],
   }
   file { "/opt/netbox-$netbox_version/gunicorn.py":
@@ -161,7 +160,7 @@ class netbox::deps::config (
     owner   => 'root',
     group   => 'root',
     content => file('netbox/netbox-rq.service'),
-    notify  => File['netbox_systemctl_daemon_reload'],
+    notify  => Exec['netbox_systemctl_daemon_reload'],
   }
   file { '/etc/systemd/system/netbox.service':
     ensure  => file,
@@ -169,7 +168,7 @@ class netbox::deps::config (
     owner   => 'root',
     group   => 'root',
     content => file('netbox/netbox.service'),
-    notify  => File['netbox_systemctl_daemon_reload'],
+    notify  => Exec['netbox_systemctl_daemon_reload'],
   }
   exec { 'netbox_systemctl_daemon_reload':
     command     => "systemctl daemon-reload",
@@ -278,6 +277,11 @@ class netbox::deps::three {
       package { 'python38':
         ensure => installed
       }
+    }
+    file { '/usr/bin/python3':
+      ensure   => link,
+      target   => "/usr/bin/python3.8",
+      require  => Package["python38"],
     }
     if ! defined (Package['python38-devel']) {
       package { 'python38-devel':
