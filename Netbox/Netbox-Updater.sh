@@ -69,15 +69,15 @@ else
   done
 fi
 
-if [[ $DIR -z ]]; then
+if [[ -z $DIR ]]; then
   DIR="/opt"
 fi
-if [[ $PRE -z ]]; then
+if [[ -z $PRE ]]; then
   >&2 echo "Missing Arguments Supplied."
   >&2 echo "Check --usage for usaged details."
   exit 1
 fi
-if [[ $LAT -z ]]; then
+if [[ -z $LAT ]]; then
   >&2 echo "Missing Arguments Supplied."
   >&2 echo "Check --usage for usaged details."
   exit 1
