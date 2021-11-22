@@ -109,6 +109,11 @@ cp -pr ${DIR}/netbox-${PRE}/netbox/netbox/configuration.py ${DIR}/netbox-${LAT}/
 cp -pr ${DIR}/netbox-${PRE}/netbox/netbox/ldap_config.py ${DIR}/netbox-${LAT}/netbox/netbox/
 cp -pr ${DIR}/netbox-${PRE}/netbox/{media,scripts,reports} ${DIR}/netbox-${LAT}/netbox/
 
+if [ -f /usr/bin/python3.8 ]; then
+  echo "2.5. Setting Python 3 Version"
+  alias python3="/usr/bin/python3.8"
+fi
+
 echo "3. Running Upgrade Script"
 cd ${DIR}/netbox-${LAT}
 ./upgrade.sh
